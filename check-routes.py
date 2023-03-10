@@ -117,7 +117,15 @@ def check_file(subnet_file :str) -> list:
     with open(subnet_file, "r") as file:
         linenr = 1
         for line in file.readlines():
-            m = re.match(r"^push route (.*)$", line)
+            # Insert missing "/"
+            m = re.search(r" [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\"$", line)
+            if m:
+                pos = line.rfind(" ")
+                if pos > 0:
+                    line = line[:pos] + "/" + line[pos+1:]
+                    logger.debug(f"Fix missing /: {line}")
+
+            m = re.match(r"^push \"route (.*)\"$", line)
             if m:
                 try:
                     # Checking for invalid subnet definition
