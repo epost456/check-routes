@@ -3,7 +3,7 @@
 
 Requirements
     Python >= 3.6
-    Packages: 
+    Packages: ipaddress
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,7 @@ logger = logging.getLogger(__name__)
 class ErrorType(Enum):
     INVALID = 1   # Invalid subnet
     OVERLAP = 2   # Overlapping subnets
+    FORMAT = 3    # Invalid format
 
     @classmethod
     def has_value(this, value):
@@ -119,11 +120,19 @@ def check_file(subnet_file :str) -> list:
             m = re.match(r"^push route (.*)$", line)
             if m:
                 try:
+                    # Checking for invalid subnet definition
                     subnet = IPv4Network(m.group(1))
                 except ValueError as e:
                     error_list.append(Error({m.group(1)}, ErrorType.INVALID, f"Invalid subnet {m.group(1)} on line number {linenr}"))
                 else:
                     networks[subnet] = linenr
+            else:
+                # Ignore comment line
+                m = re.match(r"^\s*#", line)
+                if not m:
+                    # Invalid line
+                    error_list.append(Error("", ErrorType.FORMAT, f"Invalid line {line} on line number {linenr}"))
+
             linenr += 1
 
     networks_list = sorted(networks.keys())
