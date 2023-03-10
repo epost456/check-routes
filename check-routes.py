@@ -145,15 +145,17 @@ def check_file(subnet_file :str) -> list:
 
     networks_list = sorted(networks.keys())
 
-    prev_network = networks_list.pop(0)
-    for current_network in networks_list:
-        logger.debug(f"Comparing {prev_network} <-> {current_network}")
-        if prev_network.overlaps(current_network):
-            error_list.append(Error({str(prev_network), str(current_network)}, ErrorType.OVERLAP, f"Network {prev_network} overlaps {current_network}"))
-        else:
-            logger.debug(f"OK: {current_network}")
-        prev_network = current_network
-    logger.debug(f"OK: {prev_network}")
+    # Checking for overlapping subnets
+    if len(networks_list) > 1:
+        prev_network = networks_list.pop(0)
+        for current_network in networks_list:
+            logger.debug(f"Comparing {prev_network} <-> {current_network}")
+            if prev_network.overlaps(current_network):
+                error_list.append(Error({str(prev_network), str(current_network)}, ErrorType.OVERLAP, f"Network {prev_network} overlaps {current_network}"))
+            else:
+                logger.debug(f"OK: {current_network}")
+            prev_network = current_network
+        logger.debug(f"OK: {prev_network}")
 
     return error_list
 
