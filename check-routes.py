@@ -176,9 +176,9 @@ def main():
 
     error_list = check_file(args.subnet_file)
     for error in error_list:
-        mylogger.error(f"{error.msg}")
         ret = 1
-
+        if not args.quiet:
+            mylogger.error(f"{error.msg}")
 
     exit(ret)
 
