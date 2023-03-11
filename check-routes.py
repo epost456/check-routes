@@ -115,9 +115,11 @@ def check_file(subnet_file :str) -> list:
     networks = {}
 
     with open(subnet_file, "r") as file:
-        linenr = 1
+        linenr = 0
         for line in file.readlines():
-            # Insert missing "/"
+            linenr += 1
+
+            # Insert missing "/" before subnet
             m = re.search(r" [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\"$", line)
             if m:
                 pos = line.rfind(" ")
@@ -125,23 +127,24 @@ def check_file(subnet_file :str) -> list:
                     line = line[:pos] + "/" + line[pos+1:]
                     logger.debug(f"Fix missing /: {line}")
 
+            # Checking for invalid subnet definition
             m = re.match(r"^push \"route (.*)\"$", line)
             if m:
                 try:
-                    # Checking for invalid subnet definition
                     subnet = IPv4Network(m.group(1))
                 except ValueError as e:
                     error_list.append(Error({m.group(1)}, ErrorType.INVALID, f"Invalid subnet {m.group(1)} on line number {linenr}"))
                 else:
                     networks[subnet] = linenr
-            else:
-                # Ignore comment line
-                m = re.match(r"^\s*#", line)
-                if not m:
-                    # Invalid line
-                    error_list.append(Error("", ErrorType.FORMAT, f"Invalid line {line} on line number {linenr}"))
+                finally:
+                    continue
 
-            linenr += 1
+            # Ignore comment and empty lines
+            m1 = re.match(r"^\s*#", line)
+            m2 = re.match(r"^\s*$", line)
+            if not m1 and not m2:
+                # Invalid line
+                error_list.append(Error("", ErrorType.FORMAT, f"Invalid line {line} on line number {linenr}"))
 
     networks_list = sorted(networks.keys())
 
