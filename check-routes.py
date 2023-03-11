@@ -27,7 +27,7 @@ from ipaddress import IPv4Network
 from typing import Optional
 
 __license__ = "GPLv3"
-__version__ = "0.1"
+__version__ = "1.0"
 
 
 # Global defaults that can be changed by command line parameters
