@@ -35,6 +35,11 @@ class TestRoutes(unittest.TestCase):
         self.assertEqual(error_list[0].type, cr.ErrorType.FORMAT)
         self.assertEqual(error_list[0].subnets, "")
 
+    def test_error06(self):
+        '''Routes file with empty lines'''
+        error_list = cr.check_file("tests/routes_err06.txt")
+        self.assertEqual(len(error_list), 1)
+
 if __name__ == '__main__':
     unittest.main()
 
