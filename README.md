@@ -7,6 +7,7 @@ Check overlapping subnets
 - Reads subnets from file (file format can be easily adapted)
 - Check if subnet conforms to CIDR format
 - Check if subnets overlap
+- Useful if subnet file is part of an OpenVPN configuration (push routes to client)
 
 ## Prerequisites
 - Python >= 3.6
